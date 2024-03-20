@@ -11,7 +11,6 @@ const stripe = Stripe(process.env.STRIPE_KEY);
 const router = express.Router();
 
 const ENCRYPTION_KEY = '0123456789abcdef0123456789abcdef'; // Example 32-byte key
-console.log(ENCRYPTION_KEY); // Must be 32 bytes (256 bits)
 const IV_LENGTH = 16; // For AES, this is always 16
 
 function encryptCardNumber(cardNumber) {
@@ -51,7 +50,7 @@ router.post('/create-checkout-session', async (req, res) => {
                     images: [item.image.url || item.image.secure_url], // Ensure this points to a valid image URL
                     description: item.desc,
                 },
-                unit_amount: item.price * 3.8, // Stripe expects amounts in cents
+                unit_amount: item.price * 100, // Stripe expects amounts in cents
             },
             quantity: 1, // Default quantity set to 1
         };

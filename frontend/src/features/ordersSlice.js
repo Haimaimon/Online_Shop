@@ -7,6 +7,19 @@ const initialState ={
     status:null,
 };
 
+export const fetchOrdersByUserId = createAsyncThunk(
+  'orders/fetchOrdersByUserId',
+  async (userId, thunkAPI) => {
+      try {
+          const response = await axios.get(`${url}/orders/user/${userId}`, setHeaders());
+          return response.data;
+      } catch (error) {
+          return thunkAPI.rejectWithValue(error.response.data);
+      }
+  }
+);
+
+
 export const ordersFetch = createAsyncThunk("orders/ordersFetch" , async () => {
     try {
         const response = await axios.get(`${url}/orders` , setHeaders());
@@ -71,6 +84,14 @@ const ordersSlice = createSlice({
           })
           .addCase(ordersEdit.rejected, (state) => {
             state.status = "rejected";
+          })
+          .addCase(fetchOrdersByUserId.fulfilled, (state, action) => {
+            state.userOrders = action.payload;
+            state.status = 'succeeded';
+          })
+          .addCase(fetchOrdersByUserId.rejected, (state, action) => {
+            state.error = action.payload;
+            state.status = 'failed';
           });
       },
 });

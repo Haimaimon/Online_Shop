@@ -3,6 +3,7 @@ import axios from "axios";
 import { url, setHeaders } from "./api";
 import { toast } from "react-toastify";
 
+
 const initialState = {
   items: [],
   status: null,
@@ -44,18 +45,41 @@ export const productsCreate = createAsyncThunk(
 
 export const productsEdit = createAsyncThunk(
   "products/productsEdit",
-  async (values) => {
+  async (values, thunkAPI) => {
     try {
       const response = await axios.put(
         `${url}/products/${values.product._id}`,
         values,
         setHeaders()
       );
+      
+      // If the product quantity is updated, mark related notifications as seen
+      if (values.product.quantity) {
+        await thunkAPI.dispatch(updateProductQuantity({
+          productId: values.product._id,
+          quantity: values.product.quantity
+        }));
+      }
 
       return response.data;
     } catch (error) {
       console.log(error);
       toast.error(error.response?.data);
+    }
+  }
+);
+
+
+export const updateProductQuantity = createAsyncThunk(
+  "products/updateProductQuantity",
+  async ({ productId, quantity }) => {
+    try {
+      await axios.patch(`${url}/notifications/updateQuantity`, {
+        productId,
+        quantity
+      }, setHeaders());
+    } catch (error) {
+      console.error('Error updating product quantity and notifications:', error);
     }
   }
 );

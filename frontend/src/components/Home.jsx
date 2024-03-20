@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useState , useEffect} from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import styled from 'styled-components';
 import { addToCart } from "../features/cartSlice";
 import PayButton from './PayButton';
-
+import axios from 'axios';
+import { url , setHeaders} from '../features/api';
+import { toast } from 'react-toastify';
 
 const Home = () => {
     const { items: data, status } = useSelector((state) => state.products);
+    const user = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -19,6 +22,36 @@ const Home = () => {
     const [dateFilter , setDateFilter] = useState('newest');
     const [onSaleFilter, setOnSaleFilter] = useState('');
     const [showFilters, setShowFilters] = useState(false); // State to toggle filter visibility
+    const [outofstock , setOutOfStock] = useState('');
+    const [showNotifications, setShowNotifications] = useState(false);
+
+    const [notifications, setNotifications] = useState([]);
+
+    // Function to reset all filters
+    const resetFilters = () => {
+      setSelectedCategory('All');
+      setSelectedPriceRange('All');
+      setSearchTerm('');
+      setSortOrder('');
+      setPopularityFilter('');
+      setDateFilter('newest')
+      setOnSaleFilter('');
+      setOutOfStock('');
+  };
+  useEffect(() => {
+    const fetchNotifications = async () => {
+        if (user && user._id) {
+            try {
+                const response = await axios.get(`${url}/notifications`, setHeaders());
+                setNotifications(response.data);
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+            }
+        }
+    };
+
+    fetchNotifications();
+  }, [user]);
 
     const handleToggleFilters = () => {
       setShowFilters(!showFilters); // Toggle filter visibility
@@ -57,6 +90,24 @@ const Home = () => {
       setDateFilter(e.target.value);
     };
 
+    const handleNotifyMe = async (productId) => {
+      if (!user || !user._id) {
+        toast.info('Please log in to receive notifications');
+          return;
+      }
+  
+      try {
+          const response = await axios.post(`${url}/notifications`, {
+              productId,
+              userId: user._id
+          });
+          toast.info('You will be notified when the product is back in stock');
+      } catch (error) {
+          console.error('Error sending notification request:', error);
+      }
+   };
+  
+
     // Filter and sort products based on the selected criteria
     const filteredAndSortedProducts = data
       .filter(product => {
@@ -65,7 +116,8 @@ const Home = () => {
         }
         if (selectedPriceRange !== 'All') {
           const [minPrice, maxPrice] = selectedPriceRange.split('-').map(Number);
-          return product.price >= minPrice && (maxPrice ? product.price <= maxPrice : true);
+          const priceToCompare = product.isOnSale ? product.salePrice : product.price;
+          return priceToCompare >= minPrice && (maxPrice ? priceToCompare <= maxPrice : true);
         }
         if (searchTerm) {
           return (
@@ -77,6 +129,9 @@ const Home = () => {
           return popularityFilter === 'popular' ? product.popularity : !product.popularity;
         }
         if (onSaleFilter === 'onSale' && !product.isOnSale) {
+          return false;
+        }
+        if(outofstock === 'outOfstock' && product.quantity > 0){
           return false;
         }
         return true;
@@ -107,6 +162,20 @@ const Home = () => {
       
     return (
         <div className="home-container">
+          <ToggleButton onClick={() => setShowNotifications(!showNotifications)}>
+                {showNotifications ? 'Hide Notifications' : 'Show Notifications'}
+            </ToggleButton>
+            
+            {showNotifications && notifications.length > 0 && (
+                <div className="notification-banner">
+                    {notifications.map((notification) => (
+                        <div key={notification._id} className="notification-item">
+                            <p>The product is back in stock!</p>
+                            <Link to={`/product/${notification.productId}`} className="view-product-link">View product</Link>
+                        </div>
+                    ))}
+                </div>
+            )}
           <ShowFiltersButton onClick={handleToggleFilters}>
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </ShowFiltersButton> {/* Toggle Filter Button */}
@@ -147,11 +216,18 @@ const Home = () => {
                   <option value="oldest">Oldest</option>
               </FilterSelect>        
               <FilterSelect value={onSaleFilter} onChange={(e) => setOnSaleFilter(e.target.value)}>
+                  <option value="">Sort by On Sale</option>
                   <option value="">All Products</option>
                   <option value="onSale">On Sale</option>
               </FilterSelect>
-
-                       
+              <FilterSelect value={outofstock} onChange={(e) => setOutOfStock(e.target.value)}>
+                  <option value="">Sort by Out Of Stock</option>
+                  <option value="">All Products</option>
+                  <option value="outOfstock">Out Of Stock</option>
+              </FilterSelect>      
+              <ResetFilterBtn onClick={resetFilters}>
+                  Reset Filters
+              </ResetFilterBtn>    
             </FiltersContainer>
             )}
             {status === "success" ? (
@@ -166,6 +242,7 @@ const Home = () => {
                                 <img src={product.image.url} alt={product.name} />
                                 </Link>
                                 <ProductDetails>
+                                <span className="desc">Quantity :{product.quantity}</span>
                                 <span className="desc">Description :{product.desc}</span>
                                   <span className="upload-date">Uploaded: {new Date(product.createdAt).toLocaleDateString()}</span>
                                     {product.isOnSale ? (
@@ -185,7 +262,10 @@ const Home = () => {
                                           <PayButton cartItems={[product]} />
                                         </>
                                       ) : (
-                                        <OutOfStock>Out of Stock</OutOfStock>
+                                        //<OutOfStock>Out of Stock</OutOfStock>
+                                        <button onClick={() => handleNotifyMe(product._id)}>
+                                            Notify Me
+                                        </button>
                                       )}
                                     </div>
                         ))}
@@ -211,12 +291,21 @@ const FiltersContainer = styled.div`
 `;
 
 const FilterSelect = styled.select`
-  padding: 20px;
-  border-radius: 5px;
+  padding: 5px;
+  border-radius: 2px;
   background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  border: 0.2px solid #ccc;
   &:hover {
     border-color: #888;
+  }
+`;
+const ResetFilterBtn = styled.button`
+  padding: 5px;
+  border-radius: 2px;
+  background-color: #fd0000;
+  border: 0.2px solid #fa0101;
+  &:hover {
+    border-color: #e40000f5;
   }
 `;
 
@@ -299,4 +388,20 @@ const ShowFiltersButton = styled.button`
   &:focus {
     outline: none;
   }
+`;
+// Styled components
+const ToggleButton = styled.button`
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+
+    &:hover {
+        background-color: #45a049;
+    }
 `;

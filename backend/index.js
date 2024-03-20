@@ -9,6 +9,7 @@ const productsRoute = require("./routes/products");
 const users = require("./routes/users");
 const stripe = require("./routes/stripe");
 const orders = require("./routes/orders");
+const notifications = require("./routes/notifications");
 
 require("dotenv").config();
 
@@ -21,6 +22,7 @@ app.use("/api/products",productsRoute);
 app.use("/api/users", users);
 app.use("/api/stripe", stripe);
 app.use("/api/orders",orders);
+app.use("/api/notifications", notifications);
 
 
 app.get("/", (req, res) => {

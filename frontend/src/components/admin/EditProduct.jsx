@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import { PrimaryButton } from "./CommonStyled";
 import { productsEdit } from '../../features/productsSlice';
+import axios from 'axios';
+import { url, setHeaders } from '../../features/api';
 
 
 export default function EditProduct({proId}) {
@@ -73,6 +75,18 @@ export default function EditProduct({proId}) {
         }
       })
     );
+    // Check if the product quantity was increased and send a notification update request
+    if (parseInt(quantity) > currentProd.quantity) {
+      try {
+          await axios.patch(
+              `${url}/notifications/updateQuantity`,
+              { productId: currentProd._id },
+              setHeaders()
+          );
+      } catch (error) {
+          console.error('Error updating notifications:', error);
+      }
+    }
   };
 
 

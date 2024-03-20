@@ -27,6 +27,4 @@ const PayButton = ({ cartItems }) => {
     );
   };
   
-  export default PayButton;
-
-  `${url}/stripe/create-checkout-session`
+export default PayButton;

@@ -2,6 +2,8 @@ const express = require("express");
 const cloudinary =require("../utils/cloudinary");
 const { Product } = require("../models/product");
 const { auth, isUser, isAdmin } = require("../middleware/auth");
+const { Notification } = require("../models/notification"); // Assuming you have a Notification model
+
 
 const router = require("express").Router();
 
