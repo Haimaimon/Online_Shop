@@ -25,7 +25,7 @@ import Product from "./components/Details/Product";
 import UserProfile from "./components/Details/UserProfile";
 import PayButton from "./components/PayButton";
 import Order from "./components/Details/Order";
-
+import backgroundIma from './assets/nft.webp';
 
 function App() {
   const dispatch = useDispatch();
@@ -34,7 +34,18 @@ function App() {
     dispatch(loadUser(null));
   }, [dispatch]);
 
+  const appStyle = {
+    backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url(${backgroundIma})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    height: '300vh', // 100% of the viewport height
+    margin: 0,
+  };
+  
+
   return (
+  <div style={appStyle}>
     <div className="App">
       <BrowserRouter>
         <ToastContainer />
@@ -64,6 +75,7 @@ function App() {
         </div>
       </BrowserRouter>
     </div>
+  </div> 
   );
 }
 

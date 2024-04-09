@@ -77,10 +77,12 @@ const CreateProduct = () => {
           required
         />
         <select onChange={(e) => setBrand(e.target.value)} required>
-          <option value="">Select Brand</option>
-          <option value="iphone">iPhone</option>
-          <option value="samsung">Samsung</option>
-          <option value="xiomi">Xiomi</option>
+          <option value="">Select Types of NFTs</option>
+          <option value="MusicNFTs">Music NFTs</option>
+          <option value="GamingNFTs">Gaming NFTs</option>
+          <option value="FasionNFTs">Fasion NFTs</option>
+          <option value="SportsNFTs">Sports NFTs</option>
+          <option value="ArtNFTs">Art NFTs</option>
           <option value="other">Other</option>
         </select>
         <input

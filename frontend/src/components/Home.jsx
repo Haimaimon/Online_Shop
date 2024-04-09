@@ -7,10 +7,14 @@ import PayButton from './PayButton';
 import axios from 'axios';
 import { url , setHeaders} from '../features/api';
 import { toast } from 'react-toastify';
+import moment from 'moment'; // Import moment for formatting timestamps
+import { deleteNotification } from '../features/notifySlice'; // Import the action to delete a notification
+import {getTotals} from "../features/cartSlice";
 
 const Home = () => {
     const { items: data, status } = useSelector((state) => state.products);
     const user = useSelector((state) => state.auth);
+    const cart = useSelector((state) => state.cart);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -26,7 +30,26 @@ const Home = () => {
     const [showNotifications, setShowNotifications] = useState(false);
 
     const [notifications, setNotifications] = useState([]);
+    const [selectedDate, setSelectedDate] = useState('');
 
+    useEffect(() => {
+      if (user.isAdmin) {
+          data.forEach(product => {
+              if (product.quantity === 0) {
+                  toast.warning(`${product.name} is out of stock!`, { position: 'top-right' });
+              }
+          });
+      }
+  }, [data, user.isAdmin]);
+
+    useEffect(() => {
+        dispatch(getTotals());
+    }, [cart, dispatch]);
+    // Existing handle functions...
+
+    const handleDateChange = (e) => {
+      setSelectedDate(e.target.value);
+    };
     // Function to reset all filters
     const resetFilters = () => {
       setSelectedCategory('All');
@@ -37,6 +60,7 @@ const Home = () => {
       setDateFilter('newest')
       setOnSaleFilter('');
       setOutOfStock('');
+      setSelectedDate('');
   };
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -73,6 +97,14 @@ const Home = () => {
         dispatch(addToCart(productToAdd));
         navigate("/cart");
     };
+    const handleAddToCartOne = async(product) => {
+      const productToAdd = {
+          ...product,
+          price: product.isOnSale ? product.salePrice : product.price,
+      };
+      dispatch(addToCart(productToAdd));
+      navigate("/cartone");
+  };
 
     const handleCategoryChange = (e) => {
         setSelectedCategory(e.target.value);
@@ -107,6 +139,10 @@ const Home = () => {
       }
    };
   
+   const handleDeleteNotification = (notificationId) => {
+    dispatch(deleteNotification(notificationId)); // Dispatch the action to delete the notification
+    toast.info('Notification deleted'); // Show a message to the user
+  };
 
     // Filter and sort products based on the selected criteria
     const filteredAndSortedProducts = data
@@ -133,6 +169,11 @@ const Home = () => {
         }
         if(outofstock === 'outOfstock' && product.quantity > 0){
           return false;
+        }
+        // Filter by selected date
+        if (selectedDate) {
+          const productDate = new Date(product.createdAt).toISOString().split('T')[0];
+          return productDate === selectedDate;
         }
         return true;
       })
@@ -162,19 +203,22 @@ const Home = () => {
       
     return (
         <div className="home-container">
-          <ToggleButton onClick={() => setShowNotifications(!showNotifications)}>
-                {showNotifications ? 'Hide Notifications' : 'Show Notifications'}
+          {user._id && !user.isAdmin && ( // Only render the button for non-admin users
+            <ToggleButton onClick={() => setShowNotifications(!showNotifications)}>
+               {showNotifications ? 'Hide Notifications' : 'Show Notifications'}
             </ToggleButton>
-            
+          )}
             {showNotifications && notifications.length > 0 && (
-                <div className="notification-banner">
-                    {notifications.map((notification) => (
-                        <div key={notification._id} className="notification-item">
-                            <p>The product is back in stock!</p>
-                            <Link to={`/product/${notification.productId}`} className="view-product-link">View product</Link>
-                        </div>
-                    ))}
-                </div>
+              <div className="notification-banner">
+                {notifications.map((notification) => (
+                  <div key={notification._id} className="notification-item">
+                    <p>The product is back in stock!</p>
+                    <Link to={`/product/${notification.productId}`} className="view-product-link">View product</Link>
+                    <p className="notification-time">{moment(notification.createdAt).fromNow()}</p>
+                    <button onClick={() => handleDeleteNotification(notification._id)} className="delete-notification-btn">Delete</button> 
+                  </div>
+                ))}
+              </div>
             )}
           <ShowFiltersButton onClick={handleToggleFilters}>
             {showFilters ? 'Hide Filters' : 'Show Filters'}
@@ -224,7 +268,17 @@ const Home = () => {
                   <option value="">Sort by Out Of Stock</option>
                   <option value="">All Products</option>
                   <option value="outOfstock">Out Of Stock</option>
-              </FilterSelect>      
+              </FilterSelect>  
+              <FiltersContainer>
+                  {/* Existing filter inputs... */}
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                  />
+
+                  {/* Existing filter inputs... */}
+              </FiltersContainer>
               <ResetFilterBtn onClick={resetFilters}>
                   Reset Filters
               </ResetFilterBtn>    
@@ -232,7 +286,7 @@ const Home = () => {
             )}
             {status === "success" ? (
                 <>
-                    <h2>Online - Shop </h2>
+                    <h2>NFT Online-Shop </h2>
                     <div className="products">
                     {filteredAndSortedProducts.map((product) => (
                             <div key={product._id} className="product">
@@ -254,18 +308,22 @@ const Home = () => {
                                         <span>${product.price}</span>
                                     )}
                                                                   </ProductDetails>
-                                      {product.quantity > 0 ? (
+                                      {product.quantity > 0  ? (
                                         <>
                                           <button onClick={() => handleAddToCart(product)}>
                                             Add To Cart
-                                          </button>
+                                          </button>            
                                           <PayButton cartItems={[product]} />
                                         </>
                                       ) : (
-                                        //<OutOfStock>Out of Stock</OutOfStock>
-                                        <button onClick={() => handleNotifyMe(product._id)}>
-                                            Notify Me
-                                        </button>
+                                       <>
+                                       <OutOfStock>Out of Stock</OutOfStock>
+                                        {!user.isAdmin && (
+                                            <button onClick={() => handleNotifyMe(product._id)}>
+                                                Notify Me
+                                            </button>
+                                        )}
+                                         </>
                                       )}
                                     </div>
                         ))}
@@ -321,16 +379,16 @@ const ProductDetails = styled.div`
   }
 
   .desc {
-    color: #666; /* Optional: Adds a subtle color to the description */
+    color: #090606; /* Optional: Adds a subtle color to the description */
   }
 
   .price {
-    color: #333; /* Optional: Darker color for emphasis */
+    color: #110909; /* Optional: Darker color for emphasis */
   }
 
   .upload-date {
     font-style: italic; /* Optional: Differentiates the upload date */
-    color: #999; /* Optional: Subtle color for the upload date */
+    color: #000000; /* Optional: Subtle color for the upload date */
   }
 `;
 
@@ -361,13 +419,13 @@ const SearchInput = styled.input`
 `;
 
 const SalePrice = styled.span`
-    color: red;
+    color: #a71919;
     font-weight: bold;
 `;
 
 const OriginalPrice = styled.span`
     text-decoration: ${({ isOnSale }) => isOnSale ? 'line-through' : 'none'};
-    color: ${({ isOnSale }) => isOnSale ? '#999' : '#333'};
+    color: ${({ isOnSale }) => isOnSale ? '#2607ee' : '#333'};
 `;
 
 const ShowFiltersButton = styled.button`

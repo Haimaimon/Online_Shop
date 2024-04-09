@@ -88,6 +88,7 @@ const ProductContainer = styled.div`
     box-shadow: rgba(100,100,111,0.2) 0px 7px 29px 0px;
     border-radius:5px ;
     padding: 2rem;
+    color: #000000; /* Darkest black */
 `;
 
 const ProductsDetails = styled.div`
@@ -95,9 +96,11 @@ const ProductsDetails = styled.div`
     margin-left: 2rem;
     h3{
         font-size: 35px;
+        color: #000000; /* Darkest black */
     }
     p span {
         font-weight: bold;
+        color: #000000; /* Darkest black */
     }
 `;
 

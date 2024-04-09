@@ -81,7 +81,7 @@ const Chart = () => {
           <Line 
           type="monotone" 
           dataKey="amount" 
-          stroke="#8884d8" 
+          stroke="#1207e2" 
           activeDot={{ r: 8 }} 
           />
         </LineChart>
@@ -100,7 +100,7 @@ width: 100%;
 height: 300px;
 margin-top: 2rem;
 padding: 1rem;
-border: 2px solid rgba(48,51,78,0.2);
+border: 2px solid rgba(10, 30, 210, 0.2);
 border-radius: 3;
 h3 {
     margin-bottom: 1rem;

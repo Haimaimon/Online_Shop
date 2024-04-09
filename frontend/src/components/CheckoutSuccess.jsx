@@ -9,12 +9,17 @@ const CheckoutSuccess = () => {
      const dispatch = useDispatch();
      const cart = useSelector((state) => state.cart);
      const cartItems = useSelector(state => state.cart.cartItems);
-    
+     const product = useSelector(state => state.product);
+    console.log("pro" , product);
+
     useEffect(() => {
+        console.log("pro" , product);
+        console.log("protd" , cart.product);
         dispatch(clearCart());
     },[dispatch]);
 
     useEffect(() => {
+        console.log("pro" , cart);
         dispatch(getTotals());
     },[cart,dispatch]);
 

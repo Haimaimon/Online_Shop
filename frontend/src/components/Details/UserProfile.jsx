@@ -104,7 +104,9 @@ const UserProfile = () => {
                             value={user.password}
                             onChange={(e) => setUser({ ...user, password: e.target.value })}
                         />
-                        <button>{updating ? "Updating" : "Update Profile"}</button>
+                        <UpdateButton disabled={updating}>
+                            {updating ? "Updating" : "Update Profile"}
+                        </UpdateButton>
                     </form>
                 )}
                 
@@ -168,15 +170,17 @@ const ProfileContainer = styled.div`
         align-items: flex-start;
         h3 {
             margin-bottom: 0.5rem;
+            color: #000000; /* Darkest black */
         }
         label {
             margin-bottom: 0.2rem;
-            color: gray;
+            color: #c7ff43;
         }
         input {
             margin-bottom: 1rem;
             outline: none;
             border: none;
+            color: #000000; /* Darkest black */
             border-bottom: 1px solid gray;
         }
     }
@@ -213,11 +217,11 @@ const Admin = styled.div`
 `;
 
 const Customer = styled.div`
-    color: rgb(253,181,40);
+    color: rgb(254, 185, 46);
     background-color: rgba(253,181,40,0.12);
     padding: 3px 5px;
     border-radius: 3px;
-    font-size: 14px;
+    font-size: 20px;
 `;
 const OrdersContainer = styled.div`
   display: flex;
@@ -271,4 +275,23 @@ const ProductQuantity = styled.p`
 
 const ProductPrice = styled.p`
   color: #666;
+`;
+const UpdateButton = styled.button`
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding around the text */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Hand cursor on hover */
+  font-size: 16px; /* Text size */
+  transition: background-color 0.3s; /* Smooth transition for background color */
+
+  &:hover {
+    background-color: #45a049; /* Darker green on hover */
+  }
+
+  &:disabled {
+    background-color: #ccc; /* Gray background when disabled */
+    cursor: not-allowed; /* No hand cursor when disabled */
+  }
 `;

@@ -1,11 +1,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@200;400;700&display=swap");
 
+
+
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
   font-family: "Nunito", sans-serif;
 }
+
+
 
 /* Not Found */
 .not-found {
@@ -41,6 +45,10 @@
   font-size: 40px;
 }
 .nav-bag {
+  display: flex;
+  align-items: center;
+}
+.nav-notify{
   display: flex;
   align-items: center;
 }
@@ -132,7 +140,7 @@
 }
 .cart-container h2 {
   font-weight: 400;
-  font-size: 30px;
+  font-size: 50px;
   text-align: center;
 }
 .cart-container .titles {
@@ -178,7 +186,8 @@
   margin-top: 0.7rem;
   cursor: pointer;
   background: none;
-  color: gray;
+  font-size: 18px;
+  color: rgb(208, 11, 11);
 }
 .cart-item .cart-product button:hover {
   color: black;
@@ -190,7 +199,7 @@
   justify-content: center;
   width: 130px;
   max-width: 100%;
-  border: 0.5px solid rgb(177, 177, 177);
+  border: 0.5px solid rgb(12, 9, 9);
   border-radius: 5px;
 }
 .cart-item .cart-product-quantity button {
@@ -219,12 +228,13 @@
 }
 .cart-summary .clear-btn {
   width: 130px;
-  height: 40px;
+  height: 45px;
   border-radius: 5px;
-  font-weight: 400;
+  font-weight: 500;
+  font-size: 20px;
   letter-spacing: 1.15px;
-  border: 0.5px solid rgb(177, 177, 177);
-  color: gray;
+  border: 0.5px solid rgb(177, 12, 12);
+  color: rgb(255, 0, 0);
   background: none;
   outline: none;
   cursor: pointer;
@@ -270,7 +280,7 @@
 }
 .continue-shopping a,
 .start-shopping a {
-  color: gray;
+  color: rgb(17, 27, 159);
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -355,4 +365,18 @@
 
 .view-product-link:hover {
   color: #0056b3;
+}
+
+.delete-notification-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.delete-notification-btn:hover {
+  background-color: #ff1a1a;
 }

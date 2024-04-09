@@ -43,13 +43,14 @@ const Cart = () => {
       <h2>Shopping Cart</h2>
       {cart.cartItems.length === 0 ? (
         <div className="cart-empty">
-          <p>Your cart is currently empty</p>
+          <h3>Your cart is currently empty</h3>
           <div className="start-shopping">
             <Link to="/">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
+                width="40"
+                height="40"
+                color= "#1141c4"
                 fill="currentColor"
                 className="bi bi-arrow-left"
                 viewBox="0 0 16 16"
@@ -113,12 +114,13 @@ const Cart = () => {
                 <PayButton cartItems={cart.cartItems}/>
 
               ) : (
-                <button
-                  className="cart-login"
-                  onClick={() => navigate("/login")}
-                >
-                  Login to Check out
-                </button>
+                <PayButton cartItems={cart.cartItems}/>
+                //<button
+                  //className="cart-login"
+                 // onClick={() => navigate("/login")}
+               // >
+               //</div>   Login to Check out
+               // </button>
               )}
 
               <div className="continue-shopping">

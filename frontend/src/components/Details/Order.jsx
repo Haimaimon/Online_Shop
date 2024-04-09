@@ -85,6 +85,7 @@ const StyledOrder = styled.div`
    justify-content: center;
    h3 {
     margin: 1.5rem 0 0.5rem 0;
+    color: #000000; /* Darkest black */
    }
 `;
 
@@ -95,13 +96,16 @@ const OrdersContainer = styled.div`
     box-shadow: rgba(100,100,111,0.2) 0px 7px 29px 0px;
     border-radius:5px ;
     padding: 2rem;
+    color: #000000; /* Darkest black */
 `;
 
 const Items = styled.div`
    span {
     margin-right: 1.5rem;
+    color: #000000; /* Darkest black */
     &:first-child{
         font-weight: bold;
+        color: #000000; /* Darkest black */
     }
    }
 `;
@@ -113,7 +117,7 @@ const Item = styled.div`
 `;
 
 const Pending = styled.span`
-    color: rgb(253,181,40);
+    color: rgb(252, 168, 0);
     background-color: rgba(253,181,40,0.12);
     padding: 3px 5px;
     border-radius: 3px;

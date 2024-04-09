@@ -56,6 +56,7 @@ export default Dashboard;
 const StyledDashboard = styled.div`
   display: flex;
   height: 100vh;
+  
 `;
 
 const SideNav = styled.div`
@@ -67,18 +68,20 @@ const SideNav = styled.div`
   display: flex;
   flex-direction: column;
   padding: 2rem;
+  
 
   h3 {
     margin: 0 0 1rem 0;
     padding: 0;
     text-transform: uppercase;
-    font-size: 17px;
+    font-size: 20px;
+    
   }
 
   a {
     text-decoration: none;
     margin-bottom: 1rem;
-    font-size: 14px;
+    font-size: 25px;
   }
 `;
 
